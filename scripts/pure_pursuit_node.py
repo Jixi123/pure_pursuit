@@ -19,7 +19,7 @@ class PurePursuit(Node):
     def __init__(self):
         super().__init__('pure_pursuit_node')
         # TODO: create ROS subscribers and publishers
-        pf_odom_topic = '/ego_racecar/odom' # change to particle filter for actual car
+        pf_odom_topic = '/pf/viz/inferred_pose' # change to particle filter for actual car
         drive_topic = '/drive'
 
         self.odom_sub = self.create_subscription(Odometry, pf_odom_topic, self.pose_callback, 10)

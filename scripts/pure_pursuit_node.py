@@ -19,13 +19,13 @@ class PurePursuit(Node):
     def __init__(self):
         super().__init__('pure_pursuit_node')
         # TODO: create ROS subscribers and publishers
-        pf_odom_topic = '/pf/viz/inferred_pose' # change to particle filter for actual car
+        pf_odom_topic = '/pf/pose/odom' # change to particle filter for actual car
         drive_topic = '/drive'
 
         self.odom_sub = self.create_subscription(Odometry, pf_odom_topic, self.pose_callback, 10)
         self.drive_pub = self.create_publisher(AckermannDriveStamped, drive_topic, 10)
 
-        self.waypoints = np.genfromtxt('/sim_ws/waypoints/interpolated_tepper.csv', delimiter=',')
+        self.waypoints = np.genfromtxt('/home/team5/f1tenth_ws/src/pure_pursuit/waypoints/interpolated_tepper.csv', delimiter=',')
         self.waypoints = self.waypoints[:, 0 : 2]
 
         self.lookahead = 1.2

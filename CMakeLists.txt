@@ -55,6 +55,8 @@ install(PROGRAMS
   scripts/pure_pursuit_node.py
   scripts/waypoint_logger.py
   scripts/path_viz.py
+  scripts/path_node.py
+  scripts/record_waypoints_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

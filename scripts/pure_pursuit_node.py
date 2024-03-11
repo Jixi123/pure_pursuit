@@ -5,7 +5,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 from ackermann_msgs.msg import AckermannDriveStamped, AckermannDrive
 from nav_msgs.msg import Odometry
-
+from visualization_msgs.msg import Marker
 from scipy.spatial.transform import Rotation as R
 import numpy as np
 
@@ -32,7 +32,25 @@ class PurePursuit(Node):
         self.curr_index = 0
         self.clamp_angle = 20.0
 
-
+    def display_marker(self, marker_index):
+        marker = Marker()
+        marker.header.frame_id = "map"
+        marker.ns = "marker"
+        marker.header.stamp = self.get_clock().now().to_msg()
+        marker.id = 0
+        marker.type = 2
+        marker.action = 0
+        marker.pose.position.x = self.waypoints[marker_index][0]
+        marker.pose.position.y = self.waypoints[marker_index][1]
+        marker.pose.position.z = 0.0
+        marker.pose.orientation.w = 1.0
+        marker.scale.x = 0.25
+        marker.scale.z = 0.1
+        marker.scale.y = 0.25
+        marker.color.a = 1.0
+        marker.color.g = 1.0
+        self.path_pub.publish(marker)
+        
     def get_current_waypoint(self, location):
         finished = False
         num_points = self.waypoints.shape[0]
@@ -50,7 +68,8 @@ class PurePursuit(Node):
         waypoint_next = self.waypoints[min(self.curr_index + 1, num_points - 1)]
 
         current_waypoint = (waypoint_prev + waypoint_next) / 2
-
+        
+        self.display_marker(current_waypoint)
         return current_waypoint, finished
 
 

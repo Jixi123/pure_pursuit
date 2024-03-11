@@ -87,16 +87,18 @@ class PurePursuit(Node):
         return speed
     
 
-    def get_rotation_matrix(self, quaternion):
-        rotation = R.from_quat(quaternion)
-        rotation_matrix = rotation.as_matrix()
-        return rotation_matrix[0 : 3, 0 : 3]
-    
-
     def pose_callback(self, pose_msg):
+        x = pose_msg.pose.pose.orientation.x
+        y = pose_msg.pose.pose.orientation.y
+        z = pose_msg.pose.pose.orientation.z
+        w = pose_msg.pose.pose.orientation.w
+
+        rot_matrix = np.array([[1-2*y**2 - 2*z**2, 2*x*y - 2*z*w, 2*x*z + 2*y*w], 
+                                [2*x*y + 2*z*w, 1-2*x**2 - 2*z**2, 2*y*z - 2*x*w],
+                                [2*x*z - 2*y*w, 2*y*z + 2*x*w, 1-2*x**2 - 2*y**2]])
+        
+        
         location = [pose_msg.pose.pose.position.x, pose_msg.pose.pose.position.y]
-        quaternion = [pose_msg.pose.pose.orientation.x, pose_msg.pose.pose.orientation.y, pose_msg.pose.pose.orientation.z, pose_msg.pose.pose.orientation.w]
-        rot_matrix = self.get_rotation_matrix(quaternion)
 
         # find the current waypoint to track using methods mentioned in lecture
         target_waypoint, finished = self.get_current_waypoint(location)

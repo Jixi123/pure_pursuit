@@ -10,13 +10,13 @@ class WaypointPathNode(Node):
     
     def __init__(self):
         super().__init__('path_node')
-        pf_odom_topic = '/ego_racecar/odom'
+        pf_odom_topic = '/pf/pose/odom'
         path_topic = '/path'
 
         self.odom_sub = self.create_subscription(Odometry, pf_odom_topic, self.pose_callback, 10)
         self.path_pub = self.create_publisher(Path, path_topic, 10)
 
-        self.waypoints = np.genfromtxt('/sim_ws/pure_pursuit/waypoints/interpolated_tepper.csv', delimiter=',')
+        self.waypoints = np.genfromtxt('/home/team5/f1tenth_ws/src/pure_pursuit/waypoints/interpolated_tepper.csv', delimiter=',')
         self.waypoints = self.waypoints[:, 0 : 2]
 
         self.path_msg = Path()

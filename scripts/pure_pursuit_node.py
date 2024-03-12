@@ -23,16 +23,15 @@ class PurePursuit(Node):
 
         self.odom_sub = self.create_subscription(Odometry, pf_odom_topic, self.pose_callback, 10)
         self.drive_pub = self.create_publisher(AckermannDriveStamped, drive_topic, 10)
-	self.path_pub = self.create_publisher(Marker,'/visualization_marker',10)
-
+        self.path_pub = self.create_publisher(Marker,'/visualization_marker',10)
         self.waypoints = np.genfromtxt('/home/team5/f1tenth_ws/src/pure_pursuit/waypoints/interpolated_tepper.csv', delimiter=',')
         self.waypoints = self.waypoints[:, 0 : 2]
 
-        self.lookahead = 1.2
+        self.lookahead = 1.5
         self.curr_index = 0
-        self.clamp_angle = 20.0
+        self.clamp_angle = 15.0
 
-    def display_marker(self, marker_index):
+    def display_marker(self, current_waypoint):
         marker = Marker()
         marker.header.frame_id = "map"
         marker.ns = "marker"
@@ -40,8 +39,8 @@ class PurePursuit(Node):
         marker.id = 0
         marker.type = 2
         marker.action = 0
-        marker.pose.position.x = self.waypoints[marker_index][0]
-        marker.pose.position.y = self.waypoints[marker_index][1]
+        marker.pose.position.x = current_waypoint[0]
+        marker.pose.position.y = current_waypoint[1]
         marker.pose.position.z = 0.0
         marker.pose.orientation.w = 1.0
         marker.scale.x = 0.25
@@ -68,7 +67,7 @@ class PurePursuit(Node):
         waypoint_next = self.waypoints[min(self.curr_index + 1, num_points - 1)]
 
         current_waypoint = (waypoint_prev + waypoint_next) / 2
-       
+        self.display_marker(current_waypoint)
 
         return current_waypoint, finished
 

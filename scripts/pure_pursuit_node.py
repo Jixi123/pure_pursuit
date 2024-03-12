@@ -6,7 +6,6 @@ from sensor_msgs.msg import LaserScan
 from ackermann_msgs.msg import AckermannDriveStamped, AckermannDrive
 from nav_msgs.msg import Odometry
 from visualization_msgs.msg import Marker
-from scipy.spatial.transform import Rotation as R
 import numpy as np
 
 # TODO CHECK: include needed ROS msg type headers and libraries
@@ -24,6 +23,7 @@ class PurePursuit(Node):
 
         self.odom_sub = self.create_subscription(Odometry, pf_odom_topic, self.pose_callback, 10)
         self.drive_pub = self.create_publisher(AckermannDriveStamped, drive_topic, 10)
+	self.path_pub = self.create_publisher(Marker,'/visualization_marker',10)
 
         self.waypoints = np.genfromtxt('/home/team5/f1tenth_ws/src/pure_pursuit/waypoints/interpolated_tepper.csv', delimiter=',')
         self.waypoints = self.waypoints[:, 0 : 2]
@@ -68,8 +68,8 @@ class PurePursuit(Node):
         waypoint_next = self.waypoints[min(self.curr_index + 1, num_points - 1)]
 
         current_waypoint = (waypoint_prev + waypoint_next) / 2
-        
-        self.display_marker(current_waypoint)
+       
+
         return current_waypoint, finished
 
 

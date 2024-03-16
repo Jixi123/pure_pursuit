@@ -4,7 +4,7 @@ from rclpy.node import Node
 
 from sensor_msgs.msg import LaserScan
 from ackermann_msgs.msg import AckermannDriveStamped, AckermannDrive
-from nav_msgs.msg import Odometry
+from geometry_msgs.msg import PoseStamped
 from visualization_msgs.msg import Marker
 import numpy as np
 
@@ -18,10 +18,10 @@ class PurePursuit(Node):
     def __init__(self):
         super().__init__('pure_pursuit_node')
         # TODO: create ROS subscribers and publishers
-        pf_odom_topic = '/pf/pose/odom' # change to particle filter for actual car
+        pf_odom_topic = '/pf/viz/inferred_pose' # change to particle filter for actual car
         drive_topic = '/drive'
 
-        self.odom_sub = self.create_subscription(Odometry, pf_odom_topic, self.pose_callback, 10)
+        self.odom_sub = self.create_subscription(PoseStamped, pf_odom_topic, self.pose_callback, 10)
         self.drive_pub = self.create_publisher(AckermannDriveStamped, drive_topic, 10)
         self.path_pub = self.create_publisher(Marker,'/visualization_marker',10)
         self.waypoints = np.genfromtxt('/home/team5/f1tenth_ws/src/pure_pursuit/waypoints/interpolated_tepper.csv', delimiter=',')
@@ -31,7 +31,7 @@ class PurePursuit(Node):
         self.curr_index = 0
         self.clamp_angle = 15.0
 
-    def display_marker(self, current_waypoint):
+    def display_marker(self, current_waypoint, g, r):
         marker = Marker()
         marker.header.frame_id = "map"
         marker.ns = "marker"
@@ -47,7 +47,8 @@ class PurePursuit(Node):
         marker.scale.z = 0.1
         marker.scale.y = 0.25
         marker.color.a = 1.0
-        marker.color.g = 1.0
+        marker.color.g = g
+        marker.color.r = r
         self.path_pub.publish(marker)
         
     def get_current_waypoint(self, location):
@@ -67,7 +68,7 @@ class PurePursuit(Node):
         waypoint_next = self.waypoints[min(self.curr_index + 1, num_points - 1)]
 
         current_waypoint = (waypoint_prev + waypoint_next) / 2
-        self.display_marker(current_waypoint)
+        self.display_marker(current_waypoint, 0.0, 1.0)
 
         return current_waypoint, finished
 
@@ -87,17 +88,19 @@ class PurePursuit(Node):
     
 
     def pose_callback(self, pose_msg):
-        x = pose_msg.pose.pose.orientation.x
-        y = pose_msg.pose.pose.orientation.y
-        z = pose_msg.pose.pose.orientation.z
-        w = pose_msg.pose.pose.orientation.w
+        x = pose_msg.pose.orientation.x
+        y = pose_msg.pose.orientation.y
+        z = pose_msg.pose.orientation.z
+        w = pose_msg.pose.orientation.w
+
+        self.display_marker([x, y], 1.0, 0.0)
 
         rot_matrix = np.array([[1-2*y**2 - 2*z**2, 2*x*y - 2*z*w, 2*x*z + 2*y*w], 
                                 [2*x*y + 2*z*w, 1-2*x**2 - 2*z**2, 2*y*z - 2*x*w],
                                 [2*x*z - 2*y*w, 2*y*z + 2*x*w, 1-2*x**2 - 2*y**2]])
         
         
-        location = [pose_msg.pose.pose.position.x, pose_msg.pose.pose.position.y]
+        location = [pose_msg.pose.position.x, pose_msg.pose.position.y]
 
         # find the current waypoint to track using methods mentioned in lecture
         target_waypoint, finished = self.get_current_waypoint(location)

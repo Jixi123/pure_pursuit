@@ -57,6 +57,7 @@ install(PROGRAMS
   scripts/path_viz.py
   scripts/path_node.py
   scripts/record_waypoints_node.py
+  scripts/teleop_logger.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

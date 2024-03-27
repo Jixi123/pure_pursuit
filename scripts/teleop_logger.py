@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from nav_msgs.msg import Odometry
+from geometry_msgs.msg import PoseStamped
 
 import numpy as np
 import sys
@@ -12,10 +12,10 @@ class WaypointLogger(Node):
     def __init__(self):
         super().__init__('waypoint_logger_node')
 
-        odom_topic = "ego_racecar/odom"
+        odom_topic = "pf/viz/inferred_pose"
 
         # subscribe to odometry topic
-        self.odom_sub = self.create_subscription(Odometry, odom_topic, self.odom_callback, 10)
+        self.odom_sub = self.create_subscription(PoseStamped, odom_topic, self.odom_callback, 10)
         self.clicked_waypoints = np.empty((0, 2))
 
         self.x = 0.0
@@ -25,8 +25,8 @@ class WaypointLogger(Node):
         self.timer = self.create_timer(0.2, self.timer_callback)
 
     def odom_callback(self, odom_msg):
-        self.x = odom_msg.pose.pose.position.x
-        self.y = odom_msg.pose.pose.position.y
+        self.x = odom_msg.pose.position.x
+        self.y = odom_msg.pose.position.y
     
     def timer_callback(self):
         new_waypoint = np.array([[self.x, self.y]])
@@ -53,7 +53,7 @@ def main(args=None):
 
         # record clicked waypoints and save to csv
         recorded_waypoints = waypoint_logger.clicked_waypoints
-        save_recorded_waypoints(recorded_waypoints, "/sim_ws/src/lab6/waypoint_logger/waypoints_levine.csv")
+        save_recorded_waypoints(recorded_waypoints, "/home/team5/f1tenth_ws/src/pure_pursuit/waypoints_test.csv")
 
         sys.exit(0)
 

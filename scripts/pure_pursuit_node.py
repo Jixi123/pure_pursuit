@@ -24,7 +24,7 @@ class PurePursuit(Node):
         self.odom_sub = self.create_subscription(PoseStamped, pf_odom_topic, self.pose_callback, 10)
         self.drive_pub = self.create_publisher(AckermannDriveStamped, drive_topic, 10)
         self.path_pub = self.create_publisher(Marker,'/visualization_marker',10)
-        self.waypoints = np.genfromtxt('/home/team5/f1tenth_ws/src/pure_pursuit/waypoints/interpolated_tepper.csv', delimiter=',')
+        self.waypoints = np.genfromtxt('/home/team5/f1tenth_ws/src/pure_pursuit/waypoints_test.csv', delimiter=',')
         self.waypoints = self.waypoints[:, 0 : 2]
 
         self.lookahead = 1.5
@@ -115,7 +115,7 @@ class PurePursuit(Node):
 
             # calculate curvature/steering angle
             angle = (2 * goal_point_wrt_body[1]) / (self.lookahead ** 2)
-            angle = np.clip(angle, -np.deg2rad(self.clamp_angle), np.deg2rad(self.clamp_angle))
+            angle = -np.clip(angle, -np.deg2rad(self.clamp_angle), np.deg2rad(self.clamp_angle))
 
         # TODO: publish drive message, don't forget to limit the steering angle.
         drive_msg = AckermannDriveStamped()

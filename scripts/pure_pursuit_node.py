@@ -98,13 +98,13 @@ class PurePursuit(Node):
     def get_speed(self, angle):
         abs_angle = np.abs(angle)
         if abs_angle >= np.deg2rad(20):
-            speed = 0.5
-        elif abs_angle >= np.deg2rad(15):
-            speed = 0.75
-        elif abs_angle >= np.deg2rad(10):
             speed = 1.0
-        else:
+        elif abs_angle >= np.deg2rad(15):
             speed = 1.25
+        elif abs_angle >= np.deg2rad(10):
+            speed = 1.5
+        else:
+            speed = 1.75
         return speed
 
     def pose_callback(self, pose_msg):

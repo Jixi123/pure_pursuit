@@ -53,7 +53,7 @@ def main(args=None):
 
         # record clicked waypoints and save to csv
         recorded_waypoints = waypoint_logger.clicked_waypoints
-        save_recorded_waypoints(recorded_waypoints, "/home/team5/f1tenth_ws/src/pure_pursuit/waypoints_test.csv")
+        save_recorded_waypoints(recorded_waypoints, "/home/team5/f1tenth_ws/src/pure_pursuit/waypoints/waypoints_test.csv")
 
         sys.exit(0)
 

@@ -25,10 +25,10 @@ class PurePursuit(Node):
         self.odom_sub = self.create_subscription(PoseStamped, pf_odom_topic, self.pose_callback, 10)
         self.drive_pub = self.create_publisher(AckermannDriveStamped, drive_topic, 10)
         self.path_pub = self.create_publisher(Marker,'/visualization_marker', 10)
-        self.waypoints = np.genfromtxt('/home/team5/f1tenth_ws/src/pure_pursuit/waypoints/waypoints_sparse.csv', delimiter=',')
+        self.waypoints = np.genfromtxt('/home/team5/f1tenth_ws/src/pure_pursuit/waypoints/waypoints_practice2.csv', delimiter=',')
         self.waypoints = self.waypoints[:, 0 : 2]
 
-        self.lookahead = 2.0
+        self.lookahead = 1.0
         self.curr_index = 0
         self.clamp_angle = 25.0
         self.heading_current = 0.0
@@ -70,8 +70,7 @@ class PurePursuit(Node):
         [x_grid, y_grid] = np.matmul(rot_matrix, [x_base_rot, y_base_rot])
 
         return (x_grid, y_grid)
-        
-
+   
     def get_current_waypoint(self, location):
         num_points = self.waypoints.shape[0]
         closest_distance = 1000.0
@@ -81,7 +80,8 @@ class PurePursuit(Node):
             if (x_waypoint_grid < self.base_to_lidar):
                 continue
             distance = np.sqrt((self.waypoints[i, 0] - location[0])**2 + (self.waypoints[i, 1] - location[1])**2)
-            dist = np.abs(distance - self.lookahead)
+            # dist = np.abs(distance - self.lookahead)
+            dist = distance
             if dist < closest_distance:
                 self.curr_index = i
                 closest_distance = dist
@@ -97,14 +97,15 @@ class PurePursuit(Node):
 
     def get_speed(self, angle):
         abs_angle = np.abs(angle)
-        if abs_angle >= np.deg2rad(15):
-            speed = 0.75
+        if abs_angle >= np.deg2rad(20):
+            speed = 0.25
+        elif abs_angle >= np.deg2rad(15):
+            speed = 0.5
         elif abs_angle >= np.deg2rad(10):
-            speed = 1.5
+            speed = 0.75
         else:
-            speed = 2.0
+            speed = 1.0
         return speed
-    
 
     def pose_callback(self, pose_msg):
         x = pose_msg.pose.orientation.x
